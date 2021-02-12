@@ -14,7 +14,7 @@ this repository is a collection of middlewares, used to get a requestID from an 
 ## how to install
 
 ```bash
-go get github.com/Clarilab/requestid@v0.2.0
+go get github.com/Clarilab/requestid@v0.1.0
 ```
 
 ## How to use
