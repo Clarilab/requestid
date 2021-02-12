@@ -9,13 +9,12 @@ this repository is a collection of middlewares, used to get a requestID from an 
 | Framework | Support | Version |
 |:----------|:-------:|:--------:|
 | Resty     |    ✓    |      v2 |
-| Echo      |    ✓    |      v4 |
-| Atreugo   |    ✓    |     v10 |
+| Atreugo   |    ✓    |     v11 |
 
 ## how to install
 
 ```bash
-go get github.com/Wr4thon/requestid@v0.2.0
+go get github.com/Clarilab/requestid@v0.2.0
 ```
 
 ## How to use
@@ -28,7 +27,7 @@ package main
 import (
 	"context"
 
-	"github.com/Wr4thon/requestid"
+	"github.com/Clarilab/requestid"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -37,7 +36,7 @@ func main(){
 		New().
 		OnBeforeRequest(requestid.RestyMiddleware)
 
-	// this most likely will be set by an http framework such as atreugo or echo.
+	// this most likely will be set by an http framework such as atreugo.
 	ctx := context.TODO()
 	ctx = requestid.Set(ctx, "<TheRequestID>")
 
@@ -54,37 +53,41 @@ func main(){
 
 ```
 
-### echo
+### atreugo
 
 ```go
 package main
 
 import (
-	"net/http"
-
-	"github.com/Wr4thon/requestid"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/Clarilab/requestid"
+	atreugoRid "github.com/atreugo/requestid"
+	"github.com/savsgio/atreugo/v11"
+	"github.com/valyala/fasthttp"
+	"log"
 )
 
 func main() {
-	e := echo.New()
-	e.Use(middleware.RequestID())
-	e.Use(requestid.EchoMiddleware())
+	router := atreugo.New(atreugo.Config{Addr: "0.0.0.0:1337"})
+	router.UseBefore(atreugoRid.New(atreugoRid.Config{}))
+	router.UseBefore(requestid.AtreugoMiddleware())
 
-	e.GET("/", func(c echo.Context) error {
-		rid, err := requestid.Get(c.Request().Context())
-
+	router.GET("/", func(c *atreugo.RequestCtx) error {
+		rid, err := requestid.Get(c.AttachedContext())
 		if err != nil {
-      println(err.Error())
-			return c.NoContent(http.StatusInternalServerError)
+			println(err.Error())
+
+			c.Response.SetStatusCode(fasthttp.StatusNoContent)
+
+			return nil
 		}
 
 		println(rid)
-		return c.NoContent(http.StatusNoContent)
+
+		c.Response.SetStatusCode(fasthttp.StatusNoContent)
+
+		return nil
 	})
 
-	e.Logger.Error(e.Start(":1337"))
+	log.Fatal(router.ListenAndServe())
 }
-
 ```

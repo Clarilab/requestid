@@ -31,6 +31,7 @@ func Get(ctx context.Context) (requestID string, err error) {
 
 	if val == nil {
 		err = ErrNotFound
+
 		return
 	}
 

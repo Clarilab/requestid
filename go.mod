@@ -1,8 +1,8 @@
-module github.com/Wr4thon/requestid
+module github.com/Clarilab/requestid
 
 go 1.15
 
 require (
-	github.com/go-resty/resty/v2 v2.3.0
-	github.com/labstack/echo/v4 v4.1.17
+	github.com/go-resty/resty/v2 v2.5.0
+	github.com/savsgio/atreugo/v11 v11.6.1
 )
