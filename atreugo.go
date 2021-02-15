@@ -18,6 +18,9 @@ func AtreugoMiddleware() atreugo.Middleware {
 		requestIDContext := Set(attachedCtx, requestID)
 		ctx.AttachContext(requestIDContext)
 
+		// also set the header on the response (needed if the requesting client didn't generate the id themselves)
+		ctx.Response.Header.Set(headerXRequestID, requestID)
+
 		return ctx.Next()
 	}
 }
